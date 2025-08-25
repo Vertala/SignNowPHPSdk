@@ -4,30 +4,29 @@ declare(strict_types=1);
 
 namespace SignNow\Core\Provider;
 
-use GuzzleHttp\Client as HttpClient;
 use RuntimeException;
 use SignNow\ApiClient;
-use SignNow\Core\Config\ConfigLoader;
+use GuzzleHttp\Client as HttpClient;
 use SignNow\Core\Config\ConfigRepository;
 use SignNow\Core\Request\EndpointResolver;
-use SignNow\Core\Response\ResponseToEntityMapper as ResponseMapper;
-use SignNow\Core\Serializer\TypedCollectionNormalizer;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
-use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use SignNow\Core\Serializer\TypedCollectionNormalizer;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use SignNow\Core\Response\ResponseToEntityMapper as ResponseMapper;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 readonly class ApiProvider
 {
     public function __construct(
         private ContainerBuilder $container,
-        private string $configPath,
+        private array $config,
     ) {
     }
 
@@ -100,18 +99,13 @@ readonly class ApiProvider
      */
     private function buildConfig(): void
     {
-        if (!file_exists($this->configPath)) {
+        if (!is_array($this->config)) {
             throw new RuntimeException(
-                sprintf(
-                    'Config file not found at "%s" directory.',
-                    $this->configPath
-                )
+                'Config must be an array.'
             );
         }
 
-        $loader = new ConfigLoader();
-        $config = new ConfigRepository($loader->load($this->configPath));
-
+        $config = new ConfigRepository($this->config);
         $this->container
             ->set('config', $config);
 

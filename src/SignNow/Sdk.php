@@ -5,25 +5,24 @@ declare(strict_types=1);
 namespace SignNow;
 
 use Exception;
+use SignNow\Core\Token\BearerToken;
+use SignNow\Core\Provider\ApiProvider;
 use SignNow\Api\Auth\Request\TokenPost;
 use SignNow\Core\Config\ConfigRepository;
-use SignNow\Core\Provider\ApiProvider;
-use SignNow\Core\Token\BearerToken;
 use SignNow\Exception\SignNowApiException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class Sdk
 {
-    private const API_VERSION = '2024-07-30';
+    private const API_VERSION = '2025-08-25';
 
     private ?ApiProvider $provider;
 
     public function __construct(
-        ?string $configPath = null,
+        array $config = [],
     ) {
         $this->provider = new ApiProvider(
-            new ContainerBuilder(),
-            $configPath ?? dirname(__DIR__, 2) . '/.env'
+            new ContainerBuilder(), $config
         );
     }
 
