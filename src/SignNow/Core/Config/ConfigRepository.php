@@ -9,7 +9,7 @@ use SignNow\Core\Token\BasicToken;
 class ConfigRepository
 {
     private const CLIENT_NAME = 'SignNow PHP API Client/v3.0.0';
-    private const TIMEOUT = 5;
+    private const TIMEOUT = 60;
 
     public function __construct(
         private readonly array $config,
